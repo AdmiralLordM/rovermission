@@ -135,6 +135,13 @@ final class Rover
         }
     }
 
+    public function recordPhoto(): void {
+        
+    }
+
+    public function recordSample(): void {
+        
+    }
     /**
      * Final position line for output: "x y O" or "x y O LOST".
      */

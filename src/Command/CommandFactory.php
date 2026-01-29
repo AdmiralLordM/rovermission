@@ -22,6 +22,11 @@ final class CommandFactory
         self::register(new RightCommand());
         self::register(new ForwardCommand());
         
+        //testing extra commands - to see if the idea actuall works... (they might even ask this on the interview)
+        self::register(new PhotoCommand());
+        self::register(new SampleCommand());
+        self::register(new HopCommand());
+        
         //this is to allow the rovers to continue the mission even if they encounter an unknown command 
         //(who needs a space probe that stops on the first unknown command?
         //(and grinds other rovers to a halt as well :) baad space mission)

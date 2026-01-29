@@ -28,6 +28,11 @@ final class CommandsTest extends TestCase
         $this->assertSame('L', CommandFactory::create('L')->getLetter());
         $this->assertSame('R', CommandFactory::create('R')->getLetter());
         $this->assertSame('F', CommandFactory::create('F')->getLetter());
+        //checking additional commands
+        $this->assertSame('P', CommandFactory::create('P')->getLetter());
+        $this->assertSame('S', CommandFactory::create('S')->getLetter());
+        $this->assertSame('H', CommandFactory::create('H')->getLetter());
+
     }
 
     public function testCommandFactoryForUnknownCommand(): void
