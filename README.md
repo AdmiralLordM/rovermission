@@ -57,19 +57,22 @@ To create a large random input file for testing, use the generator script. It wr
 
 ```bash
 php bin/generateData.php > data.dat
+php bin/generateData.php 20x20 > data.dat
 ```
 
-The generated file has:
+**Argument (optional):** `INTxINT` — max terrain X and Y (e.g. `20x20` → grid 0..20, 0..20). Values must be 0..50. If omitted, default is **50×50**.
 
-- **Terrain:** 50×50 (upper-right coordinates).
-- **Rovers:** 100 rovers, each with a random starting position and orientation.
-- **Commands per rover:** 99 (max allowed by the spec). Commands are random with a bias toward `F` (movement); in-place rotation is limited to at most 4 consecutive L/R (one “panoramic” turn), then a move is forced.
+**Generated file:**
 
-Then run the Mission you generated:
+- **Terrain:** From argument or 50×50 (upper-right coordinates).
+- **Rovers:** 10% of grid cells (e.g. 20×20 → 21×21 = 441 cells → 44 rovers; 50×50 → 250 rovers). Minimum 1 rover.
+- **Commands per rover:** 99 (max allowed by the spec). Commands are random with a bias toward `F` (movement); in-place rotation is limited to at most 4 consecutive L/R (one “panoramic” turn), then a move is forced. May include P, S, and H (hop).
+
+Then run the Mission on the generated file:
 
 ```bash
-php bin/run.php datatest.dat
-php bin/run.php -debug datatest.dat
+php bin/run.php data.dat
+php bin/run.php -debug data.dat
 ```
 
 ## How to Test
@@ -93,7 +96,7 @@ Tests live in the `tests/` directory and mirror the structure of `src/`. To add 
 | Path | Purpose |
 | ------ | -------- |
 | `bin/run.php` | CLI entry point: reads a file, runs the Mission (simulation), prints results to stdout. |
-| `bin/generateData.php` | Generates random test input (50×50, 100 rovers, 99 commands each) to stdout. |
+| `bin/generateData.php` | Generates random test input to stdout. Optional arg: INTxINT (e.g. 20x20) for terrain size; robots = 5% of grid cells. |
 | `src/` | Application code (namespaced under `Rovers\`). |
 | `src/GridVisualiser.php` | Draws the terrain grid with box-drawing chars when `-visualise` is used. |
 | `tests/` | PHPUnit tests (namespaced under `Rovers\Tests\`). |

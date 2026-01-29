@@ -4,17 +4,38 @@
 declare(strict_types=1);
 
 /**
- * Generates data.dat: large terrain (50x50), 100 rovers, 99 commands each.
- * Commands are random with bias toward F (movement); in-place rotation limited to
- * at most 4 consecutive L/R (one "panoramic" turn) then we force a move.
+ * Generates test input to stdout.
+ * Usage: php bin/generateData.php [INTxINT]
+ * Example: php bin/generateData.php 20x20
+ * Example: php bin/generateData.php 50x50 > test.dat
+ *
+ * INTxINT = max terrain X and Y (e.g. 20x20 → grid 0..20, 0..20). Default 50x50.
+ * Number of robots = 10% of grid cells ( (maxX+1)*(maxY+1) ), minimum 1.
+ * Commands are random with bias toward F; in-place rotation limited to 4 L/R then move.
  */
 
-const MAX_TERRAIN_X = 50;
-const MAX_TERRAIN_Y = 50;
-const NUM_ROBOTS = 100;
+const DEFAULT_TERRAIN = '50x50';
 const COMMANDS_PER_ROBOT = 99; // spec: instruction string < 100 chars
 const ORIENTATIONS = ['N', 'S', 'E', 'W'];
 const MAX_CONSECUTIVE_ROTATIONS = 4; // one full turn, then move
+const ROBOT_PERCENT = 0.1; // 10% of grid cells
+
+/**
+ * Parse INTxINT from argument. Returns [maxX, maxY] or null if invalid.
+ *
+ * @return array{0: int, 1: int}|null
+ */
+function parseTerrainArg(string $arg): ?array {
+    if (!\preg_match('/^(\d+)x(\d+)$/i', \trim($arg), $m)) {
+        return null;
+    }
+    $maxX = (int) $m[1];
+    $maxY = (int) $m[2];
+    if ($maxX > 50 || $maxY > 50 || $maxX < 0 || $maxY < 0) {
+        return null;
+    }
+    return [$maxX, $maxY];
+}
 
 function generateInstructionString(): string {
     $chars = [];
@@ -48,18 +69,32 @@ function generateInstructionString(): string {
 }
 
 function main(): void {
-    $lines = [];
-    $lines[] = MAX_TERRAIN_X . ' ' . MAX_TERRAIN_Y;
+    $args = $GLOBALS['argv'] ?? [];
+    $arg = isset($args[1]) ? $args[1] : DEFAULT_TERRAIN;
+    $parsed = parseTerrainArg($arg);
+    if ($parsed === null) {
+        \fwrite(\STDERR, "Usage: php bin/generateData.php [INTxINT]\n");
+        \fwrite(\STDERR, "Example: php bin/generateData.php 20x20\n");
+        \fwrite(\STDERR, "INTxINT must be 0..50 (e.g. 20x20). Omit for default 50x50.\n");
+        exit(1);
+    }
+    [$maxX, $maxY] = $parsed;
 
-    for ($r = 0; $r < NUM_ROBOTS; $r++) {
-        $x = random_int(0, MAX_TERRAIN_X);
-        $y = random_int(0, MAX_TERRAIN_Y);
+    $gridCells = ($maxX+1) * ($maxY+1);
+    $numRobots = (int) \max(1, \floor($gridCells * ROBOT_PERCENT));
+
+    $lines = [];
+    $lines[] = $maxX . ' ' . $maxY;
+
+    for ($r = 0; $r < $numRobots; $r++) {
+        $x = random_int(0, $maxX);
+        $y = random_int(0, $maxY);
         $o = ORIENTATIONS[array_rand(ORIENTATIONS)];
         $lines[] = "{$x} {$y} {$o}";
         $lines[] = generateInstructionString();
     }
 
-    echo implode("\n", $lines) . "\n";
+    echo \implode("\n", $lines) . "\n";
 }
 
 main();
