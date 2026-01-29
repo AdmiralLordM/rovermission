@@ -42,7 +42,9 @@ if ($input === false) {
 try {
     $simulation = new Mission();
     $result = $simulation->run($input);
-    var_dump($result);
+    foreach ($result as $line) {
+        echo $line . "\n";
+    }
    
 } catch (\Throwable $e) {
     echo "Mission Failed: " . $e->getMessage() . "\n";
