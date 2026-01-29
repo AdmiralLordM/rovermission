@@ -30,11 +30,9 @@ final class CommandsTest extends TestCase
         $this->assertSame('F', CommandFactory::create('F')->getLetter());
     }
 
-    public function testCommandFactoryThrowsExceptionForUnknownCommand(): void
+    public function testCommandFactoryForUnknownCommand(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown command: X');
-        CommandFactory::create('X');
+        $this->assertSame('-', CommandFactory::create('X', true)->getLetter());
     }
 
     
