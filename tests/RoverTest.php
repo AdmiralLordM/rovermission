@@ -87,7 +87,18 @@ final class RoverTest extends TestCase
         $rover->moveForward();
         $this->assertSame('1 1 N LOST', $rover->getOutputLine());
     }
-    
-   
 
+    public function testMemoryStoresPhotosAndSamples(): void
+    {
+        $terrain = new Terrain(5, 5);
+        $rover = new Rover(2, 3, Orientation::east(), $terrain);
+        $this->assertSame(['photos' => [], 'samples' => []], $rover->getMemory());
+        $rover->recordPhoto();
+        $rover->recordSample();
+        $rover->moveForward();
+        $rover->recordPhoto();
+        $mem = $rover->getMemory();
+        $this->assertSame([[2, 3, 'E'], [3, 3, 'E']], $mem['photos']);
+        $this->assertSame([[2, 3]], $mem['samples']);
+    }
 }

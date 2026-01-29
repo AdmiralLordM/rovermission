@@ -13,6 +13,13 @@ final class Rover
 {
     private bool $lost = false;
 
+    /** @var array{photos: list<array{0: int, 1: int, 2: string}>, samples: list<array{0: int, 1: int}}> */
+    private array $memory = [
+        'photos' => [],
+        'samples' => [],
+    ];
+
+
     public function __construct(
         private int $x,
         private int $y,
@@ -134,14 +141,26 @@ final class Rover
             }
         }
     }
-
-    public function recordPhoto(): void {
-        
+    /**
+     * @return array{photos: list<array{0: int, 1: int, 2: string}>, samples: list<array{0: int, 1: int}}>
+     */
+    public function getMemory(): array
+    {
+        return $this->memory;
     }
 
-    public function recordSample(): void {
-        
+    /** Store current position and orientation as a photo in memory. */
+    public function recordPhoto(): void
+    {
+        $this->memory['photos'][] = [$this->x, $this->y, $this->orientation->value()];
     }
+
+    /** Store current position as a terrain sample in memory. */
+    public function recordSample(): void
+    {
+        $this->memory['samples'][] = [$this->x, $this->y];
+    }
+
     /**
      * Final position line for output: "x y O" or "x y O LOST".
      */
