@@ -42,7 +42,10 @@ if ($input === false) {
 try {
     $simulation = new Mission();
     $result = $simulation->run($input);
-    foreach ($result as $line) {
+    
+    $lines = \is_array($result) && isset($result['output']) ? $result['output'] : $result;
+
+    foreach ($lines as $line) {
         echo $line . "\n";
     }
    
